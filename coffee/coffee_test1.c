@@ -24,7 +24,7 @@ PROCESS_THREAD(coffee_test_process, ev, data){
     cfs_close(fd);
     printf("Wrote %d bytes\n", n);
   } else {
-    printf("Could not write 1\n");
+    printf("Could not write %s\n", file1);
   }
 
   /* Append to file */
@@ -38,7 +38,7 @@ PROCESS_THREAD(coffee_test_process, ev, data){
     cfs_close(fd);
     printf("Wrote %d bytes\n", n);
   } else {
-    printf("Could not write 2\n");
+    printf("Could not append %s\n", file1);
   }
 
   /* Write a file, then overwrite */
@@ -52,7 +52,7 @@ PROCESS_THREAD(coffee_test_process, ev, data){
     cfs_close(fd);
     printf("Wrote %d bytes\n", n);
   } else {
-    printf("Could not write 3\n");
+    printf("Could not write %s\n", file2);
   }
 
   fd = cfs_open(file2, CFS_WRITE);
@@ -65,7 +65,7 @@ PROCESS_THREAD(coffee_test_process, ev, data){
     cfs_close(fd);
     printf("Wrote %d bytes\n", n);
   } else {
-    printf("Could not write 3\n");
+    printf("Could not overwrite %s\n", file2);
   }
 
   /* Create a file, then delete */
@@ -79,7 +79,7 @@ PROCESS_THREAD(coffee_test_process, ev, data){
     cfs_close(fd);
     printf("Wrote %d bytes\n", n);
   } else {
-    printf("Could not write 3\n");
+    printf("Could not write %s\n", file3);
   }
 
   printf("Removing %s\n", file3);
