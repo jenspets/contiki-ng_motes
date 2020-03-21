@@ -71,7 +71,7 @@ PROCESS_THREAD(coffee_test_process, ev, data){
   /* Create a file, then delete */
   fd = cfs_open(file3, CFS_WRITE);
   if (fd != -1) {
-    printf("Creating %s\n", file2);
+    printf("Creating %s\n", file3);
     for (i=0, n=0; i<=10; i++) {
       sprintf(msg, "This text will be deleted: %d", i);
       n+= cfs_write(fd, msg, strlen(msg));
@@ -84,5 +84,6 @@ PROCESS_THREAD(coffee_test_process, ev, data){
 
   printf("Removing %s\n", file3);
   cfs_remove(file3);
-  
+
+  PROCESS_END();
 }
