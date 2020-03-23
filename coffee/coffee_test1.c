@@ -7,11 +7,11 @@ PROCESS(coffee_test_process, "Testing Coffee file system");
 AUTOSTART_PROCESSES(&coffee_test_process);
 
 PROCESS_THREAD(coffee_test_process, ev, data){
-  int n, i = 0, fd;
+  int n, i = 0, j, fd;
   char msg[100];
-  char file1[] = "hello.txt";
-  char file2[] = "yadayada.txt";
-  char file3[] = "deleted.txt";
+  char file1[] = "file001.txt";
+  char file2[] = "file002.txt";
+  char filen[50];
   
   PROCESS_BEGIN();
 
@@ -19,8 +19,10 @@ PROCESS_THREAD(coffee_test_process, ev, data){
   fd = cfs_open(file1, CFS_WRITE);
   if (fd != -1) {
     printf("Writing file %s\n", file1);
-    sprintf(msg, "Hello #%d\n", i);
-    n = cfs_write(fd, msg, strlen(msg));
+    for (i=0, n=0; i<16; i++){
+      sprintf(msg, "File1   #%06d\n", i);
+      n += cfs_write(fd, msg, strlen(msg));
+    }
     cfs_close(fd);
     printf("Wrote %d bytes\n", n);
   } else {
@@ -31,8 +33,8 @@ PROCESS_THREAD(coffee_test_process, ev, data){
   fd = cfs_open(file1, CFS_WRITE | CFS_APPEND);
   if (fd != -1) {
     printf("Appending to %s\n", file1);
-    for (i=1, n=0; i<=10; i++){
-      sprintf(msg, "Hello #%d\n", i);
+    for (i=16, n=0; i<=40; i++){
+      sprintf(msg, "File1  A#%06d\n", i);
       n += cfs_write(fd, msg, strlen(msg));
     }
     cfs_close(fd);
@@ -45,8 +47,8 @@ PROCESS_THREAD(coffee_test_process, ev, data){
   fd = cfs_open(file2, CFS_WRITE);
   if (fd != -1) {
     printf("Writing %s\n", file2);
-    for (i=0, n=0; i<=10; i++) {
-      sprintf(msg, "This will be overwritten in a short while: %d\n", i);
+    for (i=0, n=0; i<=16; i++) {
+      sprintf(msg, "File2  A#%06d\n", i);
       n+= cfs_write(fd, msg, strlen(msg));
     }
     cfs_close(fd);
@@ -58,8 +60,8 @@ PROCESS_THREAD(coffee_test_process, ev, data){
   fd = cfs_open(file2, CFS_WRITE);
   if (fd != -1) {
     printf("Overwriting %s\n", file2);
-    for (i=0, n=0; i<=5; i++) {
-      sprintf(msg, "This a new text that overwrites the previous: %d\n", i);
+    for (i=16, n=0; i<=24; i++) {
+      sprintf(msg, "File2  B#%06d\n", i);
       n+= cfs_write(fd, msg, strlen(msg));
     }
     cfs_close(fd);
@@ -68,22 +70,47 @@ PROCESS_THREAD(coffee_test_process, ev, data){
     printf("Could not overwrite %s\n", file2);
   }
 
-  /* Create a file, then delete */
-  fd = cfs_open(file3, CFS_WRITE);
-  if (fd != -1) {
-    printf("Creating %s\n", file3);
-    for (i=0, n=0; i<=10; i++) {
-      sprintf(msg, "This text will be deleted: %d", i);
-      n+= cfs_write(fd, msg, strlen(msg));
+  /* Create several files, then delete half, and write more, and delete half again */
+  for (j=3; j<13; j++){
+    sprintf(filen, "file%03d.txt", j);
+    fd = cfs_open(filen, CFS_WRITE);
+    if (fd != -1) {
+      printf("Creating %s\n", filen);
+      for (i=0, n=0; i<=32; i++) {
+	sprintf(msg, "File%03d #%06d\n", j, i);
+	n+= cfs_write(fd, msg, strlen(msg));
+      }
+      cfs_close(fd);
+      printf("Wrote %d bytes\n", n);
+    } else {
+      printf("Could not write %s\n", filen);
     }
-    cfs_close(fd);
-    printf("Wrote %d bytes\n", n);
-  } else {
-    printf("Could not write %s\n", file3);
   }
-
-  printf("Removing %s\n", file3);
-  cfs_remove(file3);
-
+  for (j=3; j<13; j+=2){
+    sprintf(filen, "file%03d.txt", j);
+    printf("Delete file; %s\n", filen);
+    cfs_remove(filen);
+  }
+  for (j=13; j<23; j++){
+    sprintf(filen, "file%03d.txt", j);
+    fd = cfs_open(filen, CFS_WRITE);
+    if (fd != -1) {
+      printf("Creating %s\n", filen);
+      for (i=0, n=0; i<=16; i++) {
+	sprintf(msg, "File%03d #%06d\n", j, i);
+	n+= cfs_write(fd, msg, strlen(msg));
+      }
+      cfs_close(fd);
+      printf("Wrote %d bytes\n", n);
+    } else {
+      printf("Could not write %s\n", filen);
+    }
+  }
+  for (j=13; j<23; j+=2){
+    sprintf(filen, "file%03d.txt", j);
+    printf("Delete file; %s\n", filen);
+    cfs_remove(filen);
+  }
+  
   PROCESS_END();
 }
