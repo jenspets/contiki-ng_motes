@@ -1,0 +1,10 @@
+{"type": "moteconfig",
+ "version": 1,
+ "date": "2021-04-21",
+ "canaries": ["CANARY1", "CANARY2", "CANARY3"],
+ "ndevices": 16,
+ "nfiles": 10,
+ "motesource": "modifyrates_mote3.c",
+ "rate_dist": "flat_rate_rand",
+ "rate_dist_params": {"min":1, "max":1200}
+}
